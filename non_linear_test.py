@@ -55,6 +55,10 @@ def non_linearity_test(data, sig_name='acc',
     
         train_x = train_data[sig_name]
         train_y = train_data['RET']
+        #print(r_d)
+        #print(train_x.shape)
+        #print(train_y.shape)
+        #print('----------------')
     
         model.fit(train_x,train_y)
     
