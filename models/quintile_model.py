@@ -38,14 +38,15 @@ class QuintileSort():
        
        
        X = pd.DataFrame()
-       X['sig'] = x
-       X['ret'] = y
+       X['sig'] = x.values
+       X['ret'] = y.values
        X['rank'] = X['sig'].rank()
        X = X.sort_values(['rank'])
        min_rank = X['rank'].min()
        max_rank = X['rank'].max()
        X['rank'] = ( X['rank'] - min_rank ) / (max_rank - min_rank)
-       
+       X.index = x.index       
+
        num_buckets = self.num_buckets
 
        dis_ranks = pd.Series( np.zeros(X.shape[0]), index = X.index ) * np.nan
@@ -53,8 +54,8 @@ class QuintileSort():
        for i in range(num_buckets):
            low_thrs = float(i)/float( num_buckets )
            high_thrs = float(i+1)/float( num_buckets )
-           ind = (X['rank']<high_thrs ) & (X['rank']>=low_thrs)
-           dis_ranks[ind] = i    
+           ind = np.where( (X['rank']<high_thrs ) & (X['rank']>=low_thrs) ) [0]
+           dis_ranks.iloc[ind] = i    
            
        X['dis_rank'] = dis_ranks
        X = X[ ['dis_rank', 'ret'] ]
@@ -71,13 +72,13 @@ class QuintileSort():
         """
         x = x.copy()
         X = pd.DataFrame()
-        X['sig'] = x
-        X['rank'] = x.rank()
+        X['sig'] = x.values
+        X['rank'] = X['sig'].rank()
         X = X.sort_values(['rank'])
         min_rank = X['rank'].min()
         max_rank = X['rank'].max()
         X['rank'] = ( X['rank'] - min_rank ) / (max_rank - min_rank)
-
+        X.index = x.index
         
         num_buckets = self.num_buckets
 
@@ -86,8 +87,8 @@ class QuintileSort():
         for i in range(num_buckets):
            low_thrs = float(i)/float( num_buckets )
            high_thrs = float(i+1)/float( num_buckets )
-           ind = (X['rank']<high_thrs ) & (X['rank']>=low_thrs)
-           dis_ranks[ind] = i    
+           ind = np.where( (X['rank']<high_thrs ) & (X['rank']>=low_thrs))[0]
+           dis_ranks.iloc[ind] = i    
        
         X['dis_rank'] = dis_ranks
         

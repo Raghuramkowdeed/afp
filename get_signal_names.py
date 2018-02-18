@@ -14,6 +14,7 @@ def get_signal_names():
               'acc',
               'aeavol',
               'age',
+              'agr',
               'baspread',
               'beta',
               'betasq',
