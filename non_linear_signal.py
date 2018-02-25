@@ -55,9 +55,10 @@ def get_linear_sig(sig_sr, ret_sr, look_back = 12, fit_intercept = False):
         model.fit(train_x,train_y)
         this_sig = model.predict(test_x)
         this_sig = pd.Series(this_sig, index = test_x.index)
+        this_sig = this_sig / np.sum( np.abs( this_sig ) )
         #this_sig = this_sig.rank()
-        this_sig = ( this_sig - this_sig.mean() ) / this_sig.std()
-        this_sig = this_sig.fillna(0.0)
+        #this_sig = ( this_sig - this_sig.mean() ) / this_sig.std()
+        #this_sig = this_sig.fillna(0.0)
         sig_sr = sig_sr.append(this_sig)
     
     return(sig_sr)
@@ -100,10 +101,11 @@ def get_knn_non_linear_sig(sig_sr, ret_sr, look_back = 12,num_buckets=10):
         model.fit(train_x,train_y)
         this_nl_sig = model.predict(test_x)
         this_nl_sig = pd.Series(this_nl_sig, index = test_x.index)
+        this_nl_sig = this_nl_sig / np.sum(np.abs(this_nl_sig))
         #this_nl_sig = this_nl_sig.rank()
         
-        this_nl_sig = ( this_nl_sig - this_nl_sig.mean() ) / this_nl_sig.std()      
-        this_nl_sig = this_nl_sig.fillna(0.0)
+        #this_nl_sig = ( this_nl_sig - this_nl_sig.mean() ) / this_nl_sig.std()      
+        #this_nl_sig = this_nl_sig.fillna(0.0)
         nl_sig_sr = nl_sig_sr.append(this_nl_sig)
     
     return(nl_sig_sr)
@@ -146,10 +148,11 @@ def get_kernel_non_linear_sig(sig_sr, ret_sr, look_back = 12,
         model.fit(train_x,train_y)
         this_nl_sig = model.predict(test_x)
         this_nl_sig = pd.Series(this_nl_sig, index = test_x.index)
+        this_nl_sig = this_nl_sig / np.sum(np.abs(this_nl_sig))
         #this_nl_sig = this_nl_sig.rank()
         
-        this_nl_sig = ( this_nl_sig - this_nl_sig.mean() ) / this_nl_sig.std()      
-        this_nl_sig = this_nl_sig.fillna(0.0)  
+        #this_nl_sig = ( this_nl_sig - this_nl_sig.mean() ) / this_nl_sig.std()      
+        #this_nl_sig = this_nl_sig.fillna(0.0)  
 
         nl_sig_sr = nl_sig_sr.append(this_nl_sig)
     
@@ -205,7 +208,7 @@ def get_glmnet_sig(sig_df, ret_sr, look_back = 12,num_sig_vec =[5], alpha = 0.5 
         test_x = test_data.drop(['y'], axis=1)
         test_y = test_data['y']
         
-        model = ElasticNet(alpha=alpha, fit_intercept=False, n_lambda=1000,tol=1e-8 )
+        model = ElasticNet(alpha=alpha, fit_intercept=True, n_lambda=1000,tol=1e-8 )
         model.fit(train_x,train_y)
         
         this_comb_sig_df = pd.DataFrame()
@@ -220,7 +223,11 @@ def get_glmnet_sig(sig_df, ret_sr, look_back = 12,num_sig_vec =[5], alpha = 0.5 
                 this_sel_sig = np.append( this_sel_sig, 
                                          ['NA']*(num_sig - this_sel_sig.shape[0]) )
             #print(this_sel_sig)
-            this_comb_sig_df[str(num_sig) ] = model.predict(test_x, s)
+            this_sig = model.predict(test_x, s)       
+            this_sig = pd.Series(this_sig, index = test_x.index)
+            this_sig = this_sig / np.sum( np.abs( this_sig ) )
+                      
+            this_comb_sig_df[str(num_sig) ] = this_sig
             sel_sig_names.append(this_sel_sig)
         
         sel_sig_names_vec.append(sel_sig_names)

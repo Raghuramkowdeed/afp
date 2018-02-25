@@ -26,6 +26,7 @@ class PortfolioOptimizer():
 
         self.fac_ret = pd.read_csv(self.fac_ret_file, index_col = 'date')
         self.fac_ret.index = [ dt.datetime.strptime(val, '%Y-%m-%d') for val in self.fac_ret.index ]
+        self.fac_ret = self.fac_ret.shift(1)
         
         fac_files = os.listdir(self.fac_data_dir)
         fac_files = np.sort(fac_files)
@@ -73,7 +74,7 @@ class PortfolioOptimizer():
             this_fac_exp = self.fac_exp_df.loc[this_date]
 
             if neu_sig:
-                lm_model = LinearRegression(fit_intercept = False)
+                lm_model = LinearRegression(fit_intercept = True)
                 lm_model.fit(this_fac_exp,this_sig)
                 res = this_sig - lm_model.predict(this_fac_exp)
                 this_sig = res
@@ -102,7 +103,7 @@ class PortfolioOptimizer():
        
         return(pnl_sr)
     
-    def neu_signal(self,sig_sr ):
+    def neu_signal(self,sig_sr, fit_intercept ):
         sig_sr = sig_sr.copy()
         
         neu_sig_sr = pd.Series()
@@ -114,7 +115,7 @@ class PortfolioOptimizer():
             this_fac_exp = self.fac_exp_df.loc[this_date]
 
             
-            lm_model = LinearRegression(fit_intercept = True)
+            lm_model = LinearRegression(fit_intercept = fit_intercept)
             lm_model.fit(this_fac_exp,this_sig)
             res = this_sig - lm_model.predict(this_fac_exp)
             this_sig = res
