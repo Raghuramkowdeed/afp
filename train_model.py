@@ -15,6 +15,8 @@ from sklearn.kernel_ridge import KernelRidge
 import multiprocessing as mp
 from glmnet import ElasticNet
 from sklearn.cross_decomposition import PLSRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 
 import os as os
 
@@ -24,7 +26,9 @@ def get_model_names():
                     'knn',
                     'ridge_kernel',
                     'glmnet',
-                    'pls_regression'
+                    'pls_regression',
+                    'decision_tree',
+                    'gradient_boost'
                     
                    ]
     return(model_names)
@@ -50,16 +54,33 @@ def get_default_model_arg(model_name):
         
     if model_name == 'pls_regression':
         arg_dict = { 'n_components':1, 'scale':False, 'max_iter':10000, 'tol':1e-08, 'copy':True }
+
+#        class sklearn.tree.DecisionTreeRegressor
+        
+    if model_name == 'decision_tree':
+       arg_dict = { 'criterion':'mse',  
+                    'max_depth':None,  
+                    'min_samples_leaf':10, 
+                  }         
+    
+    if model_name == 'gradient_boost':
+        arg_dict = { 'loss':'ls', 
+                      'learning_rate':0.01, 
+                      'n_estimators':100, 
+                      'min_samples_leaf':1, 
+                       'max_depth':10
+                   }
+    
     
     return arg_dict    
         
 
-def train_model( X, y , model_name , model_arg = None,):
+def train_model( X, y , model_name , model_arg = None,sample_weights = None):
     X = X.copy()
     y = y.copy()
     
     
-    
+    model_arg = model_arg.copy()
     model_names = get_model_names()
     
     if model_name not in model_names :
@@ -73,22 +94,36 @@ def train_model( X, y , model_name , model_arg = None,):
     
     if model_name == 'linear_regression':
         model = LinearRegression(**model_arg)
+        model.fit(X,y,sample_weight= sample_weights)
     
     if model_name == 'knn':
         model_arg['n_neighbors'] = int( X.shape[0]*1.0/model_arg['n_neighbors'] )
         model = KNeighborsRegressor(**model_arg)
+        model.fit(X,y,sample_weight= sample_weights)
     
     if model_name == 'ridge_kernel':
         model = KernelRidge(**model_arg)
+        model.fit(X,y,sample_weight= sample_weights)
     
     if model_name == 'glmnet':
         model = ElasticNet(**model_arg)
+        model.fit(X,y,sample_weight= sample_weights)
     
     if model_name == 'pls_regression':
         #y = y.reshape( (y.shape[0], 1) )
         model = PLSRegression(**model_arg)
-        
-    model.fit(X,y)
+        model.fit(X,y,sample_weight= sample_weights)
+    
+    if model_name == 'decision_tree':
+        model_arg['min_samples_leaf'] = int( X.shape[0]*1.0/model_arg['min_samples_leaf'] )
+        model = DecisionTreeRegressor(**model_arg)
+        model.fit(X,y,sample_weight= sample_weights)
+    
+    if model_name == 'gradient_boost':
+        model_arg['min_samples_leaf'] = int( X.shape[0]*1.0/model_arg['min_samples_leaf'] )
+        model = GradientBoostingRegressor(**model_arg)
+        model.fit(X,y,sample_weight= sample_weights)
+
     return ( model )
 
 def get_lambda(model, num_signals= 5):

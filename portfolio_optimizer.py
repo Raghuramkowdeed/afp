@@ -63,13 +63,14 @@ class PortfolioOptimizer():
         self.ret_sr = ret_sr
         
     def run_signal(self,sig_sr, neu_sig = False ):
+        print('inside')
         sig_sr = sig_sr.copy()
         
         pnl_sr = []
         rebalance_dates = ( sig_sr.index.unique()).sort_values()        
         
         for this_date in rebalance_dates :
-            #print(this_date)
+            print(this_date)
             this_sig = sig_sr.loc[this_date]                                    
             this_fac_exp = self.fac_exp_df.loc[this_date]
 
@@ -88,9 +89,16 @@ class PortfolioOptimizer():
             
             this_fac_cov = self.fac_cov_df.loc[this_date]
             this_vol_sr = self.vol_sr.loc[this_date]
-            this_cov = np.dot(this_fac_exp,np.dot(this_fac_cov, this_fac_exp.T)) + np.diag(this_vol_sr)
+            this_vol_sr[this_vol_sr==0] = this_vol_sr[this_vol_sr !=0 ].mean()
             
-            this_cov_inv = np.linalg.inv(this_cov)
+            if neu_sig :
+                this_cov_inv = np.diag(1/(this_vol_sr*this_vol_sr))
+                #this_cov_inv = 1.0/(this_cov)
+            else :    
+                this_cov = np.dot(this_fac_exp,np.dot(this_fac_cov, this_fac_exp.T)) + np.diag(this_vol_sr*this_vol_sr)
+                this_cov_inv = np.linalg.inv(this_cov)
+            
+            #this_cov_inv = np.linalg.inv(this_cov)
             weights = np.dot(this_cov_inv, this_sig)
             weights = weights / np.sum(  ( np.abs(weights) ) )
             
@@ -100,7 +108,7 @@ class PortfolioOptimizer():
             pnl_sr.append(this_pnl)
             
         pnl_sr = pd.Series(pnl_sr, index = rebalance_dates)
-       
+        print('-----------')
         return(pnl_sr)
     
     def neu_signal(self,sig_sr, fit_intercept ):
