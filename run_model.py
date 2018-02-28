@@ -26,6 +26,7 @@ def run_model(sig_df, ret_sr, model_name, train_model_arg=None,
     data['ret'] = ret_sr
     
     model_sig_sr = pd.Series()    
+    model_vec = []    
     
     for ind in range(look_back, rebalance_dates.shape[0] ) :
 
@@ -71,8 +72,9 @@ def run_model(sig_df, ret_sr, model_name, train_model_arg=None,
         #this_sig = ( this_sig - this_sig.mean() ) / this_sig.std()
         #this_sig = this_sig.fillna(0.0)
         model_sig_sr = model_sig_sr.append(this_sig)
+        model_vec.append(model)
     print('-----------')
-    return(model_sig_sr)
+    return(model_sig_sr, model_vec)
 
 
 def this_train_model_func(this_arg):
