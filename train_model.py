@@ -118,7 +118,7 @@ def train_model( X, y , model_name , model_arg = None,sample_weights = None, sig
         
     if model_name == 'huber_regression':
         model = HuberRegressor(**model_arg)
-        model.fit(X,y,sample_weight= sample_weights, signs_vec)
+        model.fit(X,y,sample_weight= sample_weights, signs_vec=signs_vec)
     
     if model_name == 'pls_regression':
         #y = y.reshape( (y.shape[0], 1) )

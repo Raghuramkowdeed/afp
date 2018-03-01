@@ -16,7 +16,7 @@ exec(open("./train_model.py").read())
 
 
 def run_model(sig_df, ret_sr, model_name, train_model_arg=None, 
-              pred_model_arg ={},look_back=12, sample_decay = 0.0 ) :
+              pred_model_arg ={},look_back=12, sample_decay = 0.0, signs_vec = None ) :
                   
     sig_df = sig_df.copy()
     ret_sr = ret_sr.copy()
@@ -63,7 +63,7 @@ def run_model(sig_df, ret_sr, model_name, train_model_arg=None,
         
         #print(train_X.shape)
         #print(sample_weights.shape)
-        model = train_model(train_X, train_y, model_name, train_model_arg, sample_weights)
+        model = train_model(train_X, train_y, model_name, train_model_arg, sample_weights, signs_vec)
 
         this_sig = predict_model(model_name, model, test_X, pred_model_arg )
         this_sig = pd.Series(this_sig, index = test_X.index)

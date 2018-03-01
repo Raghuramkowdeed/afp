@@ -9,12 +9,12 @@ import numpy as np
 
 from scipy import optimize, sparse
 
-from ..base import BaseEstimator, RegressorMixin
-from .base import LinearModel
-from ..utils import check_X_y
-from ..utils import check_consistent_length
-from ..utils import axis0_safe_slice
-from ..utils.extmath import safe_sparse_dot
+from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.linear_model.base import LinearModel
+from sklearn.utils import check_X_y
+from sklearn.utils import check_consistent_length
+from sklearn.utils import axis0_safe_slice
+from sklearn.utils.extmath import safe_sparse_dot
 
 def _huber_loss_and_gradient(w, X, y, epsilon, alpha, sample_weight=None):
     """Returns the Huber loss and the gradient.
