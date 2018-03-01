@@ -20,12 +20,14 @@ from sklearn.ensemble import GradientBoostingRegressor
 
 import os as os
 
+exec(open("./models/huber_model.py").read())
 
 def get_model_names():
     model_names = [ 'linear_regression',
                     'knn',
                     'ridge_kernel',
                     'glmnet',
+                    'huber_regression',
                     'pls_regression',
                     'decision_tree',
                     'gradient_boost'
@@ -52,6 +54,10 @@ def get_default_model_arg(model_name):
     if model_name == 'glmnet':
         arg_dict = { 'alpha':0.5, 'fit_intercept':False, 'n_lambda':1000,'tol':1e-8 }
         
+    if model_name == 'huber_regression':
+        arg_dict = {  'epsilon':1.35, 'max_iter':10000, 'alpha':0.00001,
+                      'fit_intercept':True, 'tol':1e-07 }
+        
     if model_name == 'pls_regression':
         arg_dict = { 'n_components':1, 'scale':False, 'max_iter':10000, 'tol':1e-08, 'copy':True }
 
@@ -67,7 +73,7 @@ def get_default_model_arg(model_name):
         arg_dict = { 'loss':'ls', 
                       'learning_rate':0.01, 
                       'n_estimators':100, 
-                      'min_samples_leaf':1, 
+                      'min_samples_leaf':10, 
                        'max_depth':10
                    }
     
@@ -75,12 +81,11 @@ def get_default_model_arg(model_name):
     return arg_dict    
         
 
-def train_model( X, y , model_name , model_arg = None,sample_weights = None):
+def train_model( X, y , model_name , model_arg = None,sample_weights = None, signs_vec = None):
     X = X.copy()
     y = y.copy()
     
     
-    model_arg = model_arg.copy()
     model_names = get_model_names()
     
     if model_name not in model_names :
@@ -89,6 +94,8 @@ def train_model( X, y , model_name , model_arg = None,sample_weights = None):
     
     if model_arg is None:
         model_arg = get_default_model_arg(model_name)
+    model_arg = model_arg.copy()
+
     
     model = None
     
@@ -99,7 +106,7 @@ def train_model( X, y , model_name , model_arg = None,sample_weights = None):
     if model_name == 'knn':
         model_arg['n_neighbors'] = int( X.shape[0]*1.0/model_arg['n_neighbors'] )
         model = KNeighborsRegressor(**model_arg)
-        model.fit(X,y,sample_weight= sample_weights)
+        model.fit(X,y)
     
     if model_name == 'ridge_kernel':
         model = KernelRidge(**model_arg)
@@ -108,11 +115,15 @@ def train_model( X, y , model_name , model_arg = None,sample_weights = None):
     if model_name == 'glmnet':
         model = ElasticNet(**model_arg)
         model.fit(X,y,sample_weight= sample_weights)
+        
+    if model_name == 'huber_regression':
+        model = HuberRegressor(**model_arg)
+        model.fit(X,y,sample_weight= sample_weights, signs_vec)
     
     if model_name == 'pls_regression':
         #y = y.reshape( (y.shape[0], 1) )
         model = PLSRegression(**model_arg)
-        model.fit(X,y,sample_weight= sample_weights)
+        model.fit(X,y)
     
     if model_name == 'decision_tree':
         model_arg['min_samples_leaf'] = int( X.shape[0]*1.0/model_arg['min_samples_leaf'] )

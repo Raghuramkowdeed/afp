@@ -63,14 +63,14 @@ class PortfolioOptimizer():
         self.ret_sr = ret_sr
         
     def run_signal(self,sig_sr, neu_sig = False ):
-        print('inside')
+        #print('inside')
         sig_sr = sig_sr.copy()
         
         pnl_sr = []
         rebalance_dates = ( sig_sr.index.unique()).sort_values()        
         
         for this_date in rebalance_dates :
-            print(this_date)
+            #print(this_date)
             this_sig = sig_sr.loc[this_date]                                    
             this_fac_exp = self.fac_exp_df.loc[this_date]
 

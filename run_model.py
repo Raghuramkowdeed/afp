@@ -31,7 +31,7 @@ def run_model(sig_df, ret_sr, model_name, train_model_arg=None,
     for ind in range(look_back, rebalance_dates.shape[0] ) :
 
         r_d = rebalance_dates[ind]
-        print(r_d)
+        #print(r_d)
         train_end_date = rebalance_dates[ind-1] 
         #train_end_year = train_end_date.year
 
@@ -61,8 +61,8 @@ def run_model(sig_df, ret_sr, model_name, train_model_arg=None,
         test_X = test_data.drop(['ret'], axis=1)
         test_y = test_data['ret']
         
-        print(train_X.shape)
-        print(sample_weights.shape)
+        #print(train_X.shape)
+        #print(sample_weights.shape)
         model = train_model(train_X, train_y, model_name, train_model_arg, sample_weights)
 
         this_sig = predict_model(model_name, model, test_X, pred_model_arg )
