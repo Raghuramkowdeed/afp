@@ -183,7 +183,7 @@ class HuberRegressor(LinearModel, RegressorMixin, BaseEstimator):
         self.fit_intercept = fit_intercept
         self.tol = tol
 
-    def fit(self, X, y, sample_weight=None, signs_vec = None, max_bound = 0.1):
+    def fit(self, X, y, sample_weight=None, signs_vec = None, max_bound = 0.05):
         """Fit the model according to the given training data.
         Parameters
         ----------
