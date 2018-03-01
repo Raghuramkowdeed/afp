@@ -183,7 +183,7 @@ class HuberRegressor(LinearModel, RegressorMixin, BaseEstimator):
         self.fit_intercept = fit_intercept
         self.tol = tol
 
-    def fit(self, X, y, sample_weight=None, signs_vec = None):
+    def fit(self, X, y, sample_weight=None, signs_vec = None, max_bound = 0.1):
         """Fit the model according to the given training data.
         Parameters
         ----------
@@ -201,7 +201,7 @@ class HuberRegressor(LinearModel, RegressorMixin, BaseEstimator):
         """
         X, y = check_X_y(
             X, y, copy=False, accept_sparse=['csr'], y_numeric=True)
-        
+         
         
         if sample_weight is not None:
             sample_weight = np.array(sample_weight)
@@ -241,8 +241,10 @@ class HuberRegressor(LinearModel, RegressorMixin, BaseEstimator):
             for i, sign in enumerate( signs_vec ):
                 if sign < 0 :
                     bounds[i][1] = 0.0
+                    bounds[i][0] = -max_bound
                 if sign > 0 :
                     bounds[i][0] = 0.0
+                    bounds[i][1] = max_bound
                  
                 
 
