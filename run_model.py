@@ -31,7 +31,7 @@ def run_model(sig_df, ret_sr, model_name, train_model_arg=None,
     for ind in range(look_back, rebalance_dates.shape[0] ) :
 
         r_d = rebalance_dates[ind]
-        #print(r_d)
+        print(r_d)
         train_end_date = rebalance_dates[ind-1] 
         #train_end_year = train_end_date.year
 

@@ -172,7 +172,7 @@ def get_lambda(model, num_signals= 5):
     s = model.lambda_path_[coef_ind]
     return(s, w_ind)
 
-def get_glmnet_sig(sig_df, ret_sr, look_back = 12,num_sig_vec =[5], alpha = 0.5 ):
+def get_glmnet_sig(sig_df, ret_sr, look_back = 12,sample_decay =1.0,num_sig_vec =[5], alpha = 0.5, signs_vec = None ):
     sig_df = sig_df.copy()
     ret_sr = ret_sr.copy()
     
@@ -208,8 +208,15 @@ def get_glmnet_sig(sig_df, ret_sr, look_back = 12,num_sig_vec =[5], alpha = 0.5 
         test_x = test_data.drop(['y'], axis=1)
         test_y = test_data['y']
         
+        num_stocks = test_data.shape[0]
+        sample_weights = np.ones(num_stocks*look_back)
+        
+        for i1 in range(look_back):
+            this_i1 = range(i1*num_stocks, ((i1+1)*num_stocks)-1)
+            sample_weights[this_i1] = np.exp(-sample_decay*(look_back-1-i1))
+        
         model = ElasticNet(alpha=alpha, fit_intercept=True, n_lambda=1000,tol=1e-8 )
-        model.fit(train_x,train_y)
+        model.fit(train_x, train_y,sample_weight= sample_weights, signs_vec=signs_vec)
         
         this_comb_sig_df = pd.DataFrame()
         sel_sig_names = []
