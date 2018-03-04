@@ -51,7 +51,7 @@ def get_default_model_arg(model_name):
         arg_dict = {'n_neighbors':10}
         
     if model_name == 'ridge_kernel':
-        arg_dict = { 'kernel':'rbf','alpha':0.5,'gamma':0.3}
+        arg_dict = { 'kernel':'rbf','alpha':0.5,'gamma':0.5}
     
     if model_name == 'glmnet':
         arg_dict = { 'alpha':0.5, 'fit_intercept':True, 'n_lambda':1000,'tol':1e-8 }
